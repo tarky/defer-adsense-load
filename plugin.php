@@ -35,7 +35,6 @@ if(!(is_admin())) {
 function defer_adsense_script(){
 	echo <<< EOM
 <script>
-if( document.querySelectorAll('.adsbygoogle').length > 0 ){
 (function(window, document) {
 function main() {
 	// GoogleAdSense読込み
@@ -77,27 +76,24 @@ window.addEventListener('load', function() {
 	}
 });
 })(window, document);
-}
 </script>
 EOM;
 }
 
-add_action( 'shutdown', 'defer_adsense_script', 99 );
-
-add_filter('the_content','remove_defer_adsense', 99);
-function remove_defer_adsense($content){
+add_filter('the_content','insert_defer_adsense', 99);
+function insert_defer_adsense($content){
 	if(get_post_meta( get_the_ID(), "custom_ad_off", true) == 'この記事で広告を表示しない' ) {
-		remove_action( 'shutdown', 'defer_adsense_script', 99 );
-	}else{
-		$check_content = mb_convert_encoding($content, 'HTML-ENTITIES', 'auto');
-		$dom = new DOMDocument;
-		$dom->loadHTML($check_content);
-		$xpath = new DOMXPath($dom);
-		$adsense = $xpath->query('//*[@class="adsbygoogle"]');
-		if($adsense->length == 0){
-			remove_action( 'shutdown', 'defer_adsense_script', 99 );
-		}
+		return $content;
 	}
+	$check_content = mb_convert_encoding($content, 'HTML-ENTITIES', 'auto');
+	$dom = new DOMDocument;
+	$dom->loadHTML($check_content);
+	$xpath = new DOMXPath($dom);
+	$adsense = $xpath->query('//*[@class="adsbygoogle"]');
+	if($adsense->length == 0){
+		return $content;
+	}
+  add_action( 'shutdown', 'defer_adsense_script' );
 	return $content;
 }
 }
