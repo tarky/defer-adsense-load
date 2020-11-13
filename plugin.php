@@ -30,8 +30,6 @@ License:
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-if(!(is_admin())) {
-
 function defer_adsense_script(){
 	echo <<< EOM
 <script>
@@ -95,5 +93,4 @@ function insert_defer_adsense($content){
 	}
   add_action( 'shutdown', 'defer_adsense_script' );
 	return $content;
-}
 }
